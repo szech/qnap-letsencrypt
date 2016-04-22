@@ -1,4 +1,4 @@
-# Let's Encrypt on QNAP : Adapted for TS-251
+# Let's Encrypt on QNAP : Adapted for TS-251 [Work in progress]
 Amended Yannik's script to expose temp web directory to the real-world
 ## Install Instructions
 ### NAS Setup
