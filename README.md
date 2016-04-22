@@ -1,4 +1,4 @@
-# Let's Encrypt on QNAP
+# Let's Encrypt on QNAP : Adapted for TS-251
 ## Install Instructions
 ### NAS Setup
 1. Login to your NAS and make sure the following Apps are installed:
