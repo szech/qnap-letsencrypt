@@ -10,15 +10,16 @@ echo "Stopping Qthttpd hogging port 80.."
 
 /etc/init.d/Qthttpd.sh stop
 
-mkdir -p tmp-webroot/.well-known/acme-challenge
-cd tmp-webroot
+
+mkdir -p /share/Web/.well-known/acme-challenge
+cd /share/Web/.well-known/acme-challenge
 python -m SimpleHTTPServer 80 &
 pid=$!
 cd ..
 echo "Started python SimpleHTTPServer with pid $pid"
 
 export SSL_CERT_FILE=cacert.pem
-python acme-tiny/acme_tiny.py --account-key letsencrypt/account.key --csr letsencrypt/domain.csr --acme-dir tmp-webroot/.well-known/acme-challenge > letsencrypt/signed.crt
+python acme-tiny/acme_tiny.py --account-key letsencrypt/account.key --csr letsencrypt/domain.csr --acme-dir /share/Web/.well-known/acme-challenge > letsencrypt/signed.crt
 echo "Downloading intermediate certificate..."
 wget --no-verbose -O - https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem > letsencrypt/intermediate.pem
 cat letsencrypt/signed.crt letsencrypt/intermediate.pem > letsencrypt/chained.pem
