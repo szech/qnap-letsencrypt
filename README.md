@@ -1,5 +1,7 @@
-# Let's Encrypt on QNAP : Adapted for TS-251 [Work in progress]
-Amended Yannik's script to expose temp web directory to the real-world
+# Let's Encrypt on QNAP : Adapted for TS-251 
+Inspired by [Yannik's project](https://github.com/Yannik/qnap-letsencrypt) and http://banduccm.blogspot.co.uk/.
+
+
 ## Install Instructions
 ### NAS Setup
 1. Login to your NAS and make sure the following Apps are installed:
@@ -7,6 +9,8 @@ Amended Yannik's script to expose temp web directory to the real-world
       * Python 2.7
 2. Make sure your NAS is reachable from the public internet under the domain you want to get a certificate for on port 80.
 3. Create a folder to store qnap-letsencrypt in under `/share/YOUR_DRIVE/`. Do not create it directly in `/share/`, as it will be lost after a reboot!
+4. Download and unzip [QPython2](http://www.positiv-it.fr/QNAP/APP/QPython2_2.7.11.0_x86.qpkg.zip). Install this by going to the App Center in the QNAP web interface, click on the cog icon and then follow the instructions in the popup.
+
 
 ### Setting up a valid ca-bundle and cloning this repo
 
@@ -30,39 +34,24 @@ installed. Therefore we will have to download one manually.
     ```
     git config --system http.sslVerify true
     git config --system http.sslCAinfo `pwd`/cacert.pem
-    git clone https://github.com/Yannik/qnap-letsencrypt.git
+    git clone https://github.com/szech/qnap-letsencrypt.git
     mv cacert.pem qnap-letsencrypt
     cd qnap-letsencrypt
     git config --system http.sslCAinfo `pwd`/cacert.pem
     ```
 
 ### Setting up qnap-letsencrypt
-1. Run `init.sh`
+1. Edit `renew_certificate` and put your own values in the `VARIABLES` section   
 
-2. Create a Certificate Signing Request(csr):
+2. `mv /etc/stunnel/stunnel.pem /etc/stunnel/stunnel.pem.orig` (backup, though we can always recover through the web gui)
 
-    **single domain cert:** (replace nas.xxx.de with your domain name)
-    ```
-    cd letsencrypt
-    openssl req -new -sha256 -key keys/domain.key -subj "/CN=nas.xxx.de" > domain.csr
-    ```
+3. Run `renew_certificate.sh`
 
-    **multiple domain cert:** (replace nas.xxx.de and nas.xxx.com with your domain names)
-    ```
-    cd letsencypt
-    cp ../openssl.cnf openssl-csr-conf.cnf
-    printf "subjectAltName=DNS:nas.xxx.de,DNS:nas.xxx.com" >> openssl-csr-config.cnf
-    openssl req -new -sha256 -key keys/domain.key -subj "/" -reqexts SAN -config openssl-csr-config.cnf > domain.csr
-    ```
-4. `mv /etc/stunnel/stunnel.pem /etc/stunnel/stunnel.pem.orig` (backup)
-
-5. Run `renew_certificate.sh`
-
-6. `account.key`, `domain.key` and even the csr (according to acme-tiny readme) can be reused, so just create a cronjob to run `renew_certificate.sh` every night, which will renew your certificate if it has less than 30 days left
+4. Create a cronjob to run `renew_certificate.sh` every night, which will renew your certificate if it has less than 30 days left
 
     Add this to `/etc/config/crontab`:
     ```
-    30 3 * * * cd /share/CE_CACHEDEV1_DATA/qnap-letsencrypt/ && ./renew_certificate.sh >> ./renew_certificate.log 2>&1
+    30 3 * * * cd /share/YOUR_INSTALL_LOCATION/qnap-letsencrypt/ && ./renew_certificate.sh >> ./renew_certificate.log 2>&1
     ```
 
     Then run:
@@ -72,56 +61,20 @@ installed. Therefore we will have to download one manually.
     ```
 
 ### FAQ
-#### Why is xxx not working after a reboot?
-Anything that's added to one of the following directories is gone after a reboot:
-  - `/root/` (`.gitconfig`, `.bash_history`)
-  - `/share/` (with the exception of anything added to drives mounted there)
-  - `/etc/ssl/`, `/etc/ssl/certs`
 
-Additionally, the following is not surviving a reboot:
-  - Cronjobs added using `crontab -e`
+#### Why did you create this fork?
+I am just running the default Qnap web server on a custom domain. I had some problems getting the python web server working in Yannik's project, so i decided to fork and pursue a different approach.
 
-Note that qpkgs get installed to `/share/CE_CACHEDEV1_DATA/.qpkg`. Due to this they are only available after unlocking your disks encryption.
+#### What's different to Yannik's original script?
+- we install custom package QPython2 so we can run the letsencrypt client natively. This means we don't run the Python web server, or the acme-tiny client. QPython2 is a 1GB monster that has a lot more than what we need, but i did not find any other convenient source for the letsencrypt client which does not run natively on qnap OS. QPython is sourced from [here](http://forum.qnap.com/viewtopic.php?f=217&t=109899).
+- only support for one domain; you are welcome to fork and figure out your own approach ;-)
+ 
+#### There is a newer version of QPython2, why aren't you using that?
+letsencrypt seems to have some broken dependencies in 2_2.7.11.0.1 and isn't working. 
 
-#### What is actually surving a reboot?
-  - Anything that is on a drive, e.g. `/share/CE_CACHEDEV1_DATA/`
-  - `/etc/stunnel/stunnel.pem` (the ssl certificate used for the webinterface) seems to survive a reboot
+#### I disagree with your terrible code!
+I'm no expert, please respond if you have some feedback for me.
 
-#### What about surviving an firmware update?
-In my tests, all the above applied. I couldn't see anything additional being lost.
-
-#### How to generate content of `/etc/ssl/certs`?
-This is only documented as it was part of my research and is not needed for the letsencrypt certificate generation.
-
-First, install Perl from the qnap app manager.
-
-Then, in your qnap-letsencrypt directory:
-```
-mkdir certs
-cat cacert.pem | awk 'split_after==1{n++;split_after=0} /-----END CERTIFICATE-----/ {split_after=1} {print > "certs/cert" n ".pem"}'
-wget --ca-certificate cacert.pem https://raw.githubusercontent.com/ChatSecure/OpenSSL/master/tools/c_rehash
-/opt/bin/perl c_rehash certs
-export SSL_CERT_FILE=`pwd`/cacert.pem
-```
-
-You can now copy this to `/etc/ssl/certs`. Alternatively, you can do this directly in `/etc/ssl/certs` if you want to, but remember, that it is lost after a reboot.
-
-#### How to test whether a python script fails due to missing ca certificates
-
-```
-#from urllib.request import urlopen # Python 3
-#from urllib2 import urlopen # Python 2
-urlopen("https://google.com")
-```
-
-If you get this:
-```
-urllib2.URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed (_ssl.c:581)>
-```
-
-there is something wrong.
-
-Remember to run `export SSL_CERT_FILE=cacert.pem` though, as it is done in `renew_certificates.sh`
 #### How can I contribute anything to this project?
 Please open a pull request!
 
