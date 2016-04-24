@@ -33,11 +33,11 @@ installed. Therefore we will have to download one manually.
 4. On your nas, in the directory you were in before
     ```
     git config --system http.sslVerify true
-    git config --system http.sslCAinfo `pwd`/cacert.pem
+    git config --system http.sslCAinfo cacert.pem
     git clone https://github.com/szech/qnap-letsencrypt.git
     mv cacert.pem qnap-letsencrypt
     cd qnap-letsencrypt
-    git config --system http.sslCAinfo `pwd`/cacert.pem
+    git config --system http.sslCAinfo cacert.pem
     ```
 
 ### Setting up qnap-letsencrypt
