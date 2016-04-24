@@ -3,8 +3,9 @@ set -e
 export PATH=/opt/QPython2/bin:$PATH
 
 # VARIABLES, replace these with your own.
-DOMAIN="szech.ikolantaksit.fi"
-EMAIL="adrian.jh.chu@gmail.com"
+DOMAIN="www.example.com"
+EMAIL="user@example.com"
+###########################################
 DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 
@@ -12,13 +13,10 @@ DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo "Checking whether to renew certificate on $(date -R)"
 [ -s letsencrypt/signed.crt ] && openssl x509 -noout -in letsencrypt/signed.crt -checkend 2592000 && exit
 
-echo "Renewing certificate..."
-
-
-# echo "Started python SimpleHTTPServer with pid $pid"
-
+echo "Running letsencrypt, Getting/Renewing certificate..."
 letsencrypt certonly --rsa-key-size 4096 --renew-by-default --webroot --webroot-path "/share/Web/" -d $DOMAIN -t --agree-tos --email $EMAIL --config-dir $DIR/letsencrypt 
 
+echo "...Success!"
 
 echo "Stopping stunnel and setting new stunnel certificates..."
 /etc/init.d/stunnel.sh stop
