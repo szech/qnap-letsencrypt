@@ -27,5 +27,6 @@ cp fullchain.pem /etc/stunnel/uca.pem
 
 echo "Done! Service startup and cleanup will follow now..."
 /etc/init.d/stunnel.sh start
+/etc/init.d/Qthttpd.sh restart
 
 
