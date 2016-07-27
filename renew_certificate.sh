@@ -22,8 +22,8 @@ echo "Stopping stunnel and setting new stunnel certificates..."
 /etc/init.d/stunnel.sh stop
 
 cd letsencrypt/live/$DOMAIN
-cat privkey.pem cert.pem chain.pem > /etc/stunnel/stunnel.pem
-cp fullchain.pem /etc/stunnel/uca.pem
+cat privkey.pem cert.pem > /etc/stunnel/stunnel.pem
+cp chain.pem /etc/stunnel/uca.pem
 
 echo "Done! Service startup and cleanup will follow now..."
 /etc/init.d/stunnel.sh start
