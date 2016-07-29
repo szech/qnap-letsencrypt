@@ -9,7 +9,7 @@ Inspired by [Yannik's project](https://github.com/Yannik/qnap-letsencrypt) and h
       * Python 2.7
 2. Make sure your NAS is reachable from the public internet under the domain you want to get a certificate for on port 80.
 3. Create a folder to store qnap-letsencrypt in under `/share/YOUR_DRIVE/`. Do not create it directly in `/share/`, as it will be lost after a reboot!
-4. Download and unzip [QPython2](http://www.positiv-it.fr/QNAP/APP/QPython2_2.7.11.0_x86.qpkg.zip). Install this by going to the App Center in the QNAP web interface, click on the cog icon and then follow the instructions in the popup.
+4. Download and unzip [LetsEncrypt for QNAP](http://www.positiv-it.fr/QNAP/APP/LetsEncrypt_0.5_x86.qpkg.zip). Install this by going to the App Center in the QNAP web interface, click on the cog icon and then follow the instructions in the popup.
 
 
 ### Setting up a valid ca-bundle and cloning this repo
@@ -66,7 +66,7 @@ installed. Therefore we will have to download one manually.
 I am just running the default Qnap web server on a custom domain. I had some problems getting the python web server working in Yannik's project, so i decided to fork and pursue a different approach.
 
 #### What's different to Yannik's original script?
-- we install custom package QPython2 so we can run the letsencrypt client natively. This means we don't run the Python web server, or the acme-tiny client. QPython2 is a 1GB monster that has a lot more than what we need, but i did not find any other convenient source for the letsencrypt client which does not run natively on qnap OS. QPython is sourced from [here](http://forum.qnap.com/viewtopic.php?f=217&t=109899).
+- we install a custom QNAP-compatible LetsEncrypt package so we can run the letsencrypt client natively. This means we don't run the Python web server, or the acme-tiny client. Note: Previously used QPython2, a 1GB monster that was overkill, but that was because there was no other convenient source for the letsencrypt client which does not run natively on qnap OS. QPython is sourced from [here](http://forum.qnap.com/viewtopic.php?f=217&t=109899).
 - only support for one domain; you are welcome to fork and figure out your own approach ;-)
  
 #### There is a newer version of QPython2, why aren't you using that?
