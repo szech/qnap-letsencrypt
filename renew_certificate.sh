@@ -11,7 +11,7 @@ DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # do nothing if certificate is valid for more than 30 days (30*24*60*60)
 echo "Checking whether to renew certificate on $(date -R)"
-[ -s letsencrypt/signed.crt ] && openssl x509 -noout -in letsencrypt/signed.crt -checkend 2592000 && exit
+[ -s letsencrypt/live/$DOMAIN/cert.pem ] && openssl x509 -noout -in letsencrypt/live/$DOMAIN/cert.pem -checkend 2592000 && exit
 
 echo "Running letsencrypt, Getting/Renewing certificate..."
 letsencrypt certonly --rsa-key-size 4096 --renew-by-default --webroot --webroot-path "/share/Web/" -d $DOMAIN -t --agree-tos --email $EMAIL --config-dir $DIR/letsencrypt 
