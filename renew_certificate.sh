@@ -14,7 +14,7 @@ echo DIR = $DIR
 
 # do nothing if certificate is valid for more than 30 days (30*24*60*60)
 echo "Checking whether to renew certificate on $(date -R)"
-[ -s letsencrypt/live/"$DOMAIN"-0001/cert.pem ] && openssl x509 -noout -in letsencrypt/live/"$DOMAIN"-0001/cert.pem -checkend 2592000 && exit
+[ -s letsencrypt/live/"$DOMAIN"-0001/cert.pem ] && openssl x509 -noout -in letsencrypt/live/"$DOMAIN"-0001/cert.pem -checkend 864000 && exit
 
 
 echo "Running letsencrypt, Getting/Renewing certificate..."
