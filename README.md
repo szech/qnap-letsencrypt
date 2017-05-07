@@ -1,15 +1,18 @@
 # Let's Encrypt on QNAP : Adapted for TS-251 
 Inspired by [Yannik's project](https://github.com/Yannik/qnap-letsencrypt) and http://banduccm.blogspot.co.uk/.
 
+Use this to create an ssl certificate for your custom domain, so you can securely access your QNAP NAS from the internet.
+Once that is done, you can create a cronjob to automatically renew the certificate before it expires.
 
 ## Install Instructions
 ### NAS Setup
-1. Login to your NAS and make sure the following Apps are installed:
-      * Git
-      * Python 2.7
-2. Make sure your NAS is reachable from the public internet under the domain you want to get a certificate for on port 80.
-3. Create a folder to store qnap-letsencrypt in under `/share/YOUR_DRIVE/`. Do not create it directly in `/share/`, as it will be lost after a reboot!
-4. Download and unzip [LetsEncrypt for QNAP](http://www.positiv-it.fr/QNAP/APP/LetsEncrypt_0.5_x86.qpkg.zip). Install this by going to the App Center in the QNAP web interface, click on the cog icon and then follow the instructions in the popup.
+1. Your NAS is expected to be on firmware 4.3.0 or later.
+1. Login to your NAS and make sure Git is installed.
+1. [ssh](https://wiki.qnap.com/wiki/How_to_SSH_into_your_QNAP_device) is also required.
+1. Add the qnapclub.eu repo to the App Center. You can find the instructions [here](http://qnapclub.eu/index.php?act=howto)
+1. Go into the new Qnapclub.eu repo, and install QPython2.
+1. Make sure your NAS is reachable from the public internet under the domain you want to get a certificate for on port 80.
+1. Create a folder to store qnap-letsencrypt in under `/share/YOUR_DRIVE/`. Do not create it directly in `/share/`, as it will be lost after a reboot!
 
 
 ### Setting up a valid ca-bundle and cloning this repo
@@ -47,7 +50,7 @@ installed. Therefore we will have to download one manually.
 
 3. Run `renew_certificate.sh`
 
-4. Create a cronjob to run `renew_certificate.sh` every night, which will renew your certificate if it has less than 30 days left
+4. Create a cronjob to run `renew_certificate.sh` every night, which will renew your certificate if it has less than 10 days left
 
     Add this to `/etc/config/crontab`:
     ```
@@ -66,14 +69,20 @@ installed. Therefore we will have to download one manually.
 I am just running the default Qnap web server on a custom domain. I had some problems getting the python web server working in Yannik's project, so i decided to fork and pursue a different approach.
 
 #### What's different to Yannik's original script?
-- we install a custom QNAP-compatible LetsEncrypt package so we can run the letsencrypt client natively. This means we don't run the Python web server, or the acme-tiny client. Note: Previously used QPython2, a 1GB monster that was overkill, but that was because there was no other convenient source for the letsencrypt client which does not run natively on qnap OS. QPython is sourced from [here](http://forum.qnap.com/viewtopic.php?f=217&t=109899).
-- only support for one domain; you are welcome to fork and figure out your own approach ;-)
+we install a custom QNAP-compatible LetsEncrypt package so we can run the letsencrypt client natively. This means we don't run the Python web server, or the acme-tiny client. 
+
+#### What's this QPython2 thing i have to install?
+QPython2 is a convenient source for the letsencrypt client which does not run natively on qnap OS. QPython is sourced from [here](https://forum.qnap.com/viewtopic.php?f=217&t=109899).
+
+#### Any multi-domain support?
+only support for one domain; you are welcome to fork and figure out your own approach ;-)
  
-#### There is a newer version of QPython2, why aren't you using that?
-letsencrypt seems to have some broken dependencies in 2_2.7.11.0.1 and isn't working. 
+#### There is a smaller package available for LetsEncrypt, why aren't you using that?
+That package is not compiled for x64 and isn't working with firmware 4.3.0+ 
 
 #### I disagree with your terrible code!
-I'm no expert, please respond if you have some feedback for me.
+I'm no expert in linux, nas or encryption, so please respond if you have some feedback for me.
+This is just a hobby project for my own education, and peace of mind :)
 
 #### How can I contribute anything to this project?
 Please open a pull request!
