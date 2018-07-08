@@ -14,7 +14,7 @@ echo DIR = $DIR
 
 # do nothing if certificate is valid for more than 30 days (30*24*60*60)
 echo "Checking whether to renew certificate on $(date -R)"
-[ -s letsencrypt/live/"$DOMAIN"-0001/cert.pem ] && openssl x509 -in letsencrypt/live/"$DOMAIN"-0001/cert.pem -checkend 864000 && exit
+[ -s letsencrypt/live/"$DOMAIN"/cert.pem ] && openssl x509 -in letsencrypt/live/"$DOMAIN"/cert.pem -checkend 864000 && exit
 
 
 echo "Running letsencrypt, Getting/Renewing certificate..."
@@ -26,8 +26,8 @@ echo "...Success!"
 echo "Stopping stunnel and setting new stunnel certificates..."
 /etc/init.d/stunnel.sh stop
 
-echo "live directory = "  letsencrypt/live/"$DOMAIN"-0001
-cd letsencrypt/live/"$DOMAIN"-0001
+echo "live directory = "  letsencrypt/live/"$DOMAIN"
+cd letsencrypt/live/"$DOMAIN"
 cat privkey.pem cert.pem > /etc/stunnel/stunnel.pem
 cp chain.pem /etc/stunnel/uca.pem
 
