@@ -18,7 +18,11 @@ echo "Checking whether to renew certificate on $(date -R)"
 
 
 echo "Running letsencrypt, Getting/Renewing certificate..."
-letsencrypt certonly --rsa-key-size 4096 --renew-by-default --webroot --webroot-path "/share/Web/" -d $DOMAIN -t --agree-tos --email $EMAIL --config-dir $DIR/letsencrypt 
+letsencrypt certonly --rsa-key-size 4096 --renew-by-default --webroot --webroot-path "/share/Web/" -d $DOMAIN -t --agree-tos --email $EMAIL --config-dir $DIR/letsencrypt
+
+#domain changed? e.g. aaa.com => bbb.com 
+# add parameter "--force-renewal" to above command.
+
 
 echo "...Success!"
 
